@@ -1,4 +1,4 @@
-package ru.globux.testjogl.errorchecking;
+package ru.globux.testjogl.files;
 
 import static com.jogamp.opengl.GL4.*;
 
@@ -8,18 +8,31 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.Animator;
 
-public class UsingJOGLerrorChecking implements GLEventListener {
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.Vector;
+
+public class ReadShadersFromFiles implements GLEventListener {
     private int renderingProgram;
     private int vao[] = new int[1];
 
-    public UsingJOGLerrorChecking() {
+    public ReadShadersFromFiles() {
         final GLProfile profile = GLProfile.get(GLProfile.GL4bc);
         final GLCapabilities caps = new GLCapabilities(profile);
         final GLWindow glWindow = GLWindow.create(caps);
-        glWindow.setTitle("Chapter 2 - program 3b");
+        glWindow.setTitle("Chapter 2 - program 4");
         glWindow.setSize(400, 200);
         glWindow.addGLEventListener(this);
-        //final FPSAnimator animator = new FPSAnimator(60);
         final Animator animator = new Animator(0 /* w/o AWT */);
         //animator.setUpdateFPSFrames(60, System.err);
         animator.setUpdateFPSFrames(60, null);
@@ -50,34 +63,22 @@ public class UsingJOGLerrorChecking implements GLEventListener {
 
     private int createShaderProgram() {
         GL4 gl = (GL4) GLContext.getCurrentGL();
-        int[] vertCompiled = new int[1];
-        int[] fragCompiled = new int[1];
-        int[] linked = new int[1];
 
-        String vshaderSource[] = {
-                "#version 430    \n",
-                "void main(void) \n",
-                "{ gl_Position = vec4(0.0, 0.0, 0.5, 1.0); } \n",
-                };
-        String fshaderSource[] = {
-                "#version 430    \n",
-                "out vec4 color; \n",
-                "void main(void) \n",
-                "{ color = vec4(0.0, 0.0, 1.0, 1.0); } \n"
-                };
+        String vshaderSource[] = readShaderSource("/shaders/vertShader.glsl");
+        String fshaderSource[] = readShaderSource("/shaders/fragShader.glsl");
 
         int vShader = gl.glCreateShader(GL_VERTEX_SHADER);
-        gl.glShaderSource(vShader, 3, vshaderSource, null, 0);
+        int fShader = gl.glCreateShader(GL_FRAGMENT_SHADER);
+
+        gl.glShaderSource(vShader, vshaderSource.length, vshaderSource, null, 0);
         gl.glCompileShader(vShader);
 
-        int fShader = gl.glCreateShader(GL_FRAGMENT_SHADER);
-        gl.glShaderSource(fShader, 4, fshaderSource, null, 0);
+        gl.glShaderSource(fShader, fshaderSource.length, fshaderSource, null, 0);
         gl.glCompileShader(fShader);
 
         int vfprogram = gl.glCreateProgram();
         gl.glAttachShader(vfprogram, vShader);
         gl.glAttachShader(vfprogram, fShader);
-
         gl.glLinkProgram(vfprogram);
 
         gl.glDeleteShader(vShader);
@@ -86,12 +87,35 @@ public class UsingJOGLerrorChecking implements GLEventListener {
     }
 
     public static void main(String[] args) {
-        new UsingJOGLerrorChecking();
+        new ReadShadersFromFiles();
     }
 
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
     }
 
     public void dispose(GLAutoDrawable drawable) {
+    }
+
+    private String[] readShaderSource(String filename) {
+        Path file = null;
+        try {
+            file = Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource(filename)).toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        Charset charset = StandardCharsets.US_ASCII;
+        List<String> lines = null;
+        try {
+            lines = Files.readAllLines(file, charset);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String[] program = null;
+        program = new String[lines.size()];
+        int i = 0;
+        for(String line : lines) {
+            program[i] = line + "\n";
+        }
+        return program;
     }
 }
