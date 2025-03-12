@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+group = 'ru.globux.testjogl'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    maven {url = 'https://jogamp.org/deployment/maven'}
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.jogamp.gluegen:gluegen-rt-main:2.5.0'
+    implementation 'org.jogamp.jogl:jogl-all-main:2.5.0'
+//    implementation 'org.jogamp.jogl:jogl:2.3.2'
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
