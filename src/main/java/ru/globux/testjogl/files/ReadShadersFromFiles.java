@@ -8,8 +8,8 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.util.Animator;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -17,23 +17,25 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Scanner;
-import java.util.Vector;
 
 public class ReadShadersFromFiles implements GLEventListener {
     private int renderingProgram;
     private int vao[] = new int[1];
+    private GLWindow glWindow;
+    private Animator animator;
+    List<String[]> programs = new ArrayList<>();
 
     public ReadShadersFromFiles() {
         final GLProfile profile = GLProfile.get(GLProfile.GL4bc);
         final GLCapabilities caps = new GLCapabilities(profile);
-        final GLWindow glWindow = GLWindow.create(caps);
+        glWindow = GLWindow.create(caps);
         glWindow.setTitle("Chapter 2 - program 4");
         glWindow.setSize(400, 200);
         glWindow.addGLEventListener(this);
-        final Animator animator = new Animator(0 /* w/o AWT */);
+        animator = new Animator(0 /* w/o AWT */);
         //animator.setUpdateFPSFrames(60, System.err);
         animator.setUpdateFPSFrames(60, null);
         animator.add(glWindow);
@@ -44,6 +46,22 @@ public class ReadShadersFromFiles implements GLEventListener {
                 System.exit(0);
             }
         });
+
+    }
+
+    public static void main(String[] args) {
+        ReadShadersFromFiles obj = new ReadShadersFromFiles();
+        obj.loadPrograms("shaders/vertShader.glsl");
+        obj.loadPrograms("shaders/fragShader.glsl");
+        obj.start();
+    }
+
+    public ReadShadersFromFiles loadPrograms(String file) {
+        programs.add(readShaderSource(file));
+        return this;
+    }
+
+    public void start() {
         glWindow.setVisible(true);
         animator.start();
     }
@@ -64,8 +82,10 @@ public class ReadShadersFromFiles implements GLEventListener {
     private int createShaderProgram() {
         GL4 gl = (GL4) GLContext.getCurrentGL();
 
-        String vshaderSource[] = readShaderSource("/shaders/vertShader.glsl");
-        String fshaderSource[] = readShaderSource("/shaders/fragShader.glsl");
+//        String vshaderSource[] = readShaderSource("shaders/vertShader.glsl");
+//        String fshaderSource[] = readShaderSource("shaders/fragShader.glsl");
+        String[] vshaderSource = programs.get(0);
+        String[] fshaderSource = programs.get(1);;
 
         int vShader = gl.glCreateShader(GL_VERTEX_SHADER);
         int fShader = gl.glCreateShader(GL_FRAGMENT_SHADER);
@@ -86,10 +106,6 @@ public class ReadShadersFromFiles implements GLEventListener {
         return vfprogram;
     }
 
-    public static void main(String[] args) {
-        new ReadShadersFromFiles();
-    }
-
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
     }
 
@@ -98,8 +114,10 @@ public class ReadShadersFromFiles implements GLEventListener {
 
     private String[] readShaderSource(String filename) {
         Path file = null;
+
         try {
-            file = Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource(filename)).toURI());
+            URI uri = this.getClass().getClassLoader().getResource(filename).toURI();
+            file = Paths.get(Objects.requireNonNull(uri));
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -110,11 +128,11 @@ public class ReadShadersFromFiles implements GLEventListener {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        String[] program = null;
-        program = new String[lines.size()];
+        String[] program = new String[lines.size()];
         int i = 0;
         for(String line : lines) {
             program[i] = line + "\n";
+            ++i;
         }
         return program;
     }
