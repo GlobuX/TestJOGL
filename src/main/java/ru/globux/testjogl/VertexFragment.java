@@ -1,33 +1,77 @@
 package ru.globux.testjogl;
 
-import javax.swing.*;
-
 import static com.jogamp.opengl.GL4.*;
 
+import com.jogamp.newt.event.WindowAdapter;
+import com.jogamp.newt.event.WindowEvent;
+import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
-import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.GLContext;
+import com.jogamp.opengl.util.Animator;
 
-public class VertexFragment extends JFrame implements GLEventListener {
-    private GLCanvas myCanvas;
+public class VertexFragment implements GLEventListener {
+    private GLWindow glWindow;
+    private Animator animator;
+    private float size;
+    private boolean isGrow;
     private int renderingProgram;
     private int vao[] = new int[1];
 
     public VertexFragment() {
-        setTitle("Chapter 2 - program 2");
-        setSize(600, 400);
-        myCanvas = new GLCanvas();
-        myCanvas.addGLEventListener(this);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.add(myCanvas);
-        this.setVisible(true);
+        final GLProfile profile = GLProfile.get(GLProfile.GL4bc);
+        final GLCapabilities caps = new GLCapabilities(profile);
+        this.size = 49.0f;
+        this.isGrow = true;
+        glWindow = GLWindow.create(caps);
+        glWindow.setTitle("Chapter 2 - program 2");
+        glWindow.setSize(400, 200);
+        glWindow.addGLEventListener(this);
+        animator = new Animator(0 /* w/o AWT */);
+        //animator.setUpdateFPSFrames(60, System.err);
+        animator.setUpdateFPSFrames(60, null);
+        animator.add(glWindow);
+        glWindow.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowDestroyed(final WindowEvent e) {
+                animator.stop();
+                System.exit(0);
+            }
+        });
+    }
+
+    public void start() {
+        glWindow.setVisible(true);
+        animator.start();
+    }
+
+    public static void main(String[] args) {
+        new VertexFragment().start();
     }
 
     public void display(GLAutoDrawable drawable) {
         GL4 gl = (GL4) GLContext.getCurrentGL();
+        gl.glClear(GL_DEPTH_BUFFER_BIT);
+        gl.glClear(GL_COLOR_BUFFER_BIT);
         gl.glUseProgram(renderingProgram);
-//        gl.glPointSize(1.0f);
-        gl.glPointSize(50.0f);
+        if (isGrow) {
+            if (size >= 50.0f) {
+                isGrow = false;
+                size -= 1.0f;
+            }
+            else {
+                size += 1.0f;
+            }
+        }
+        else {
+            if (size <= 1.0f) {
+                isGrow = true;
+                size += 1.0f;
+            }
+            else {
+                size -= 1.0f;
+            }
+        }
+        gl.glPointSize(size);
         gl.glDrawArrays(GL_POINTS, 0, 1);
     }
 
@@ -83,9 +127,5 @@ public class VertexFragment extends JFrame implements GLEventListener {
     }
 
     public void dispose(GLAutoDrawable drawable) {
-    }
-
-    public static void main(String[] args) {
-        new VertexFragment();
     }
 }

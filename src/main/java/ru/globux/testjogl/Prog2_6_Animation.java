@@ -35,7 +35,7 @@ public class Prog2_6_Animation implements GLEventListener {
         final GLProfile profile = GLProfile.get(GLProfile.GL4bc);
         final GLCapabilities caps = new GLCapabilities(profile);
         glWindow = GLWindow.create(caps);
-        glWindow.setTitle("Chapter 2 - program 4");
+        glWindow.setTitle("Chapter 2 - program 6");
         glWindow.setSize(400, 200);
         glWindow.addGLEventListener(this);
         animator = new Animator(0 /* w/o AWT */);
