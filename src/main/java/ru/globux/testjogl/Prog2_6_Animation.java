@@ -23,10 +23,11 @@ import static com.jogamp.opengl.GL2ES2.GL_FRAGMENT_SHADER;
 import static com.jogamp.opengl.GL2ES2.GL_VERTEX_SHADER;
 
 public class Prog2_6_Animation implements GLEventListener {
-    private int renderingProgram;
-    private int vao[] = new int[1];
     private GLWindow glWindow;
     private Animator animator;
+    private long tick;
+    private int renderingProgram;
+    private int vao[] = new int[1];
     List<String[]> programs = new ArrayList<>();
     private float x = 0.0f;  // location of triangle
     private float inc = 0.01f;  // offset for moving the triangle
@@ -74,7 +75,10 @@ public class Prog2_6_Animation implements GLEventListener {
         gl.glClear(GL_COLOR_BUFFER_BIT);  // clear the background to black, each time
         gl.glUseProgram(renderingProgram);
 
-        x += inc;   // move the triangle along x axis
+        long currentTick = System.currentTimeMillis();
+        long delta = currentTick - this.tick;
+        this.tick = currentTick;
+        x += inc * delta / 4;   // move the triangle along x axis
         if (x > 1.0f) inc = -0.01f;  // switch to moving the triangle to the left
         if (x < -1.0f) inc = 0.01f;  // switch to moving the triangle to the right
         int offsetLoc = gl.glGetUniformLocation(renderingProgram, "offset");  // retrieve pointer to "offset"
@@ -84,6 +88,7 @@ public class Prog2_6_Animation implements GLEventListener {
     }
 
     public void init(GLAutoDrawable drawable) {
+        this.tick = System.currentTimeMillis();
         GL4 gl = (GL4) GLContext.getCurrentGL();
         renderingProgram = createShaderProgram();
         gl.glGenVertexArrays(vao.length, vao, 0);

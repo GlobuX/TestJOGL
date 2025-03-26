@@ -24,18 +24,18 @@ import static com.jogamp.opengl.GL2ES2.GL_FRAGMENT_SHADER;
 import static com.jogamp.opengl.GL2ES2.GL_VERTEX_SHADER;
 
 public class Prog2_5_Triangle implements GLEventListener {
-    private int renderingProgram;
-    private int vao[] = new int[1];
     private GLWindow glWindow;
     private Animator animator;
+    private int renderingProgram;
+    private int vao[] = new int[1];
     List<String[]> programs = new ArrayList<>();
 
     public Prog2_5_Triangle() {
         final GLProfile profile = GLProfile.get(GLProfile.GL4bc);
         final GLCapabilities caps = new GLCapabilities(profile);
         glWindow = GLWindow.create(caps);
-        glWindow.setTitle("Chapter 2 - program 4");
-        glWindow.setSize(400, 200);
+        glWindow.setTitle("Chapter 2 - program 5");
+        glWindow.setSize(500, 300);
         glWindow.addGLEventListener(this);
         animator = new Animator(0 /* w/o AWT */);
         //animator.setUpdateFPSFrames(60, System.err);

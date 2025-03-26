@@ -24,7 +24,7 @@ public class VertexFragment implements GLEventListener {
         this.isGrow = true;
         glWindow = GLWindow.create(caps);
         glWindow.setTitle("Chapter 2 - program 2");
-        glWindow.setSize(400, 200);
+        glWindow.setSize(500, 300);
         glWindow.addGLEventListener(this);
         animator = new Animator(0 /* w/o AWT */);
         //animator.setUpdateFPSFrames(60, System.err);
