@@ -140,14 +140,15 @@ public class Utils {
 
         ClassLoader cl = Utils.class.getClassLoader();
         URL url = cl.getResource(filename);
-        String file = url.getPath();
-        System.out.println(file);
+//        String file = url.getPath();
+        String file = Utils.class.getClassLoader().getResource(filename).getPath();
+//        System.out.println(file);
 //            URI uri = Utils.class.getClassLoader().getResource(filename).toURI();
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
+//                System.out.println(line);
                 lines.add(line);
             }
             program = new String[lines.size()];
