@@ -1,13 +1,20 @@
 package ru.globux.testjogl.util;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.*;
 import javax.swing.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Scanner;
-import java.util.Vector;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 import static com.jogamp.opengl.GL4.*;
 
@@ -128,17 +135,24 @@ public class Utils {
     }
 
     private static String[] readShaderSource(String filename) {
-        Vector<String> lines = new Vector<String>();
-        Scanner sc;
+        List<String> lines = new ArrayList<>();
         String[] program;
-        try {
-            sc = new Scanner(new File(filename));
-            while (sc.hasNext()) {
-                lines.addElement(sc.nextLine());
+
+        ClassLoader cl = Utils.class.getClassLoader();
+        URL url = cl.getResource(filename);
+        String file = url.getPath();
+        System.out.println(file);
+//            URI uri = Utils.class.getClassLoader().getResource(filename).toURI();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+                lines.add(line);
             }
             program = new String[lines.size()];
             for (int i = 0; i < lines.size(); i++) {
-                program[i] = (String) lines.elementAt(i) + "\n";
+                program[i] = lines.get(i) + "\n";
             }
         } catch (IOException e) {
             System.err.println("IOException reading file: " + e);
@@ -146,6 +160,31 @@ public class Utils {
         }
         return program;
     }
+
+//    private static String[] readShaderSource(String filename) {
+//        Path file;
+//        try {
+//            URI uri = Utils.class.getClassLoader().getResource(filename).toURI();
+////            URI uri = this.getClass().getClassLoader().getResource(filename).toURI();
+//            file = Paths.get(Objects.requireNonNull(uri));
+//        } catch (URISyntaxException e) {
+//            throw new RuntimeException(e);
+//        }
+//        Charset charset = StandardCharsets.US_ASCII;
+//        List<String> lines = null;
+//        try {
+//            lines = Files.readAllLines(file, charset);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        String[] program = new String[lines.size()];
+//        int i = 0;
+//        for(String line : lines) {
+//            program[i] = line + "\n";
+//            ++i;
+//        }
+//        return program;
+//    }
 
     private static void printShaderLog(int shader) {
         GL4 gl = (GL4) GLContext.getCurrentGL();
