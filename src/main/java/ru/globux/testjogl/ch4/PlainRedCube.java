@@ -3,19 +3,19 @@ package ru.globux.testjogl.ch4;
 import static com.jogamp.opengl.GL4.*;
 
 import ru.globux.testjogl.util.Utils;
-
 import java.nio.*;
-import javax.swing.*;
-import java.lang.Math;
-
+import com.jogamp.newt.event.WindowAdapter;
+import com.jogamp.newt.event.WindowEvent;
+import com.jogamp.newt.opengl.GLWindow;
+import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.*;
-import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GLContext;
-import com.jogamp.opengl.math.*;
+import org.joml.Matrix4f;
 
-public class PlainRedCube extends JFrame implements GLEventListener {
-    private GLCanvas myCanvas;
+public class PlainRedCube implements GLEventListener {
+    private GLWindow glWindow;
+    private Animator animator;
     private int renderingProgram;
     private int vao[] = new int[1];
     private int vbo[] = new int[2];
@@ -32,36 +32,62 @@ public class PlainRedCube extends JFrame implements GLEventListener {
     private float aspect;
 
     public PlainRedCube() {
-        setTitle("Chapter 4 - program 1a");
-        setSize(600, 600);
-        myCanvas = new GLCanvas();
-        myCanvas.addGLEventListener(this);
-        this.add(myCanvas);
-        this.setVisible(true);
+        final GLProfile profile = GLProfile.get(GLProfile.GL4bc);
+        final GLCapabilities caps = new GLCapabilities(profile);
+        glWindow = GLWindow.create(caps);
+        glWindow.setTitle("Chapter 4 - program 1a");
+        glWindow.setSize(800, 600);
+        glWindow.addGLEventListener(this);
+        animator = new Animator(0 /* w/o AWT */);
+        //animator.setUpdateFPSFrames(60, System.err);
+        animator.setUpdateFPSFrames(60, null);
+        animator.add(glWindow);
+        glWindow.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowDestroyed(final WindowEvent e) {
+                animator.stop();
+                System.exit(0);
+            }
+        });
+    }
+
+    public void start() {
+        glWindow.setVisible(true);
+        animator.start();
     }
 
     public void display(GLAutoDrawable drawable) {
         GL4 gl = (GL4) GLContext.getCurrentGL();
         gl.glClear(GL_DEPTH_BUFFER_BIT);
+//        gl.glClear(GL_COLOR_BUFFER_BIT);
 
         gl.glUseProgram(renderingProgram);
 
         mvLoc = gl.glGetUniformLocation(renderingProgram, "mv_matrix");
         pLoc = gl.glGetUniformLocation(renderingProgram, "p_matrix");
 
-        aspect = (float) myCanvas.getWidth() / (float) myCanvas.getHeight();
-        pMat.setToPerspective((float) Math.toRadians(60.0f), aspect, 0.1f, 1000.0f);
+        aspect = (float) glWindow.getWidth() / (float) glWindow.getHeight();
+        pMat.setPerspective((float) Math.toRadians(60.0f), aspect, 0.1f, 1000.0f);
 
-        vMat.setToTranslation(-cameraX, -cameraY, -cameraZ);
+        vMat.setTranslation(-cameraX, -cameraY, -cameraZ);
 
-        mMat.setToTranslation(cubeLocX, cubeLocY, cubeLocZ);
+        mMat.setTranslation(cubeLocX, cubeLocY, cubeLocZ);
 
-        mvMat.loadIdentity();
+        mvMat.identity();
         mvMat.mul(vMat);
         mvMat.mul(mMat);
 
+//        System.out.println("FloatBuffer capacity: " + vals.capacity());
+//        System.out.println("FloatBuffer position: " + vals.position());
+
+
         gl.glUniformMatrix4fv(mvLoc, 1, false, mvMat.get(vals));
+//        System.out.println("FloatBuffer position after mvMat: " + vals.position());
+//        vals.clear();
+
         gl.glUniformMatrix4fv(pLoc, 1, false, pMat.get(vals));
+//        System.out.println("FloatBuffer position after pMat: " + vals.position());
+//        vals.clear();
 
         gl.glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
         gl.glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
@@ -77,12 +103,8 @@ public class PlainRedCube extends JFrame implements GLEventListener {
         GL4 gl = (GL4) drawable.getGL();
         renderingProgram = Utils.createShaderProgram("ch4/shaders/vertShader.glsl", "ch4/shaders/fragShader.glsl");
         setupVertices();
-        cameraX = 0.0f;
-        cameraY = 0.0f;
-        cameraZ = 8.0f;
-        cubeLocX = 0.0f;
-        cubeLocY = -2.0f;
-        cubeLocZ = 0.0f;
+        cameraX  = 0.0f;  cameraY  = 0.0f;  cameraZ  = 8.0f;
+        cubeLocX = -1.0f; cubeLocY = -2.5f; cubeLocZ = 0.0f;
     }
 
     private void setupVertices() {
@@ -112,7 +134,7 @@ public class PlainRedCube extends JFrame implements GLEventListener {
     }
 
     public static void main(String[] args) {
-        new PlainRedCube();
+        new PlainRedCube().start();
     }
 
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
