@@ -35,7 +35,7 @@ public class InterpolatedColors implements GLEventListener {
         final GLProfile profile = GLProfile.get(GLProfile.GL4bc);
         final GLCapabilities caps = new GLCapabilities(profile);
         glWindow = GLWindow.create(caps);
-        glWindow.setTitle("Chapter 4 - program 1a");
+        glWindow.setTitle("Chapter 4 - program 1b");
         glWindow.setSize(800, 600);
         glWindow.addGLEventListener(this);
         animator = new Animator(0 /* w/o AWT */);
