@@ -31,8 +31,9 @@ import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
 
 public class Utils {
-    public Utils() {
-    }
+
+//    public Utils() {
+//    }
 
     public static int createShaderProgram(String vS, String tCS, String tES, String gS, String fS) {
         GL4 gl = (GL4) GLContext.getCurrentGL();
@@ -166,7 +167,8 @@ public class Utils {
 //        Path file;
 //        try {
 //            URI uri = Utils.class.getClassLoader().getResource(filename).toURI();
-////            URI uri = this.getClass().getClassLoader().getResource(filename).toURI();
+
+//        //    URI uri = this.getClass().getClassLoader().getResource(filename).toURI();
 //            file = Paths.get(Objects.requireNonNull(uri));
 //        } catch (URISyntaxException e) {
 //            throw new RuntimeException(e);
@@ -389,16 +391,15 @@ public class Utils {
         // convert to a color model that OpenGL understands
         ComponentColorModel colorModel = new ComponentColorModel(
                 ColorSpace.getInstance(ColorSpace.CS_sRGB), new int[]{8, 8, 8, 8}, // bits
-                true,  // hasAlpha
-                false, // isAlphaPreMultiplied
+                true,       // hasAlpha
+                false,      // isAlphaPreMultiplied
                 ComponentColorModel.TRANSLUCENT,
                 DataBuffer.TYPE_BYTE);
 
         BufferedImage newImage = new BufferedImage(colorModel, raster, false, null);
         Graphics2D g = newImage.createGraphics();
 
-        if (flip)    // flip image vertically
-        {
+        if (flip) {         // flip image vertically
             AffineTransform gt = new AffineTransform();
             gt.translate(0, height);
             gt.scale(1, -1d);
@@ -414,15 +415,15 @@ public class Utils {
 
     // GOLD material - ambient, diffuse, specular, and shininess
     public static float[] goldAmbient() {
-        return (new float[]{0.2473f, 0.1995f, 0.0745f, 1});
+        return (new float[] {0.2473f, 0.1995f, 0.0745f, 1});
     }
 
     public static float[] goldDiffuse() {
-        return (new float[]{0.7516f, 0.6065f, 0.2265f, 1});
+        return (new float[] {0.7516f, 0.6065f, 0.2265f, 1});
     }
 
     public static float[] goldSpecular() {
-        return (new float[]{0.6283f, 0.5559f, 0.3661f, 1});
+        return (new float[] {0.6283f, 0.5559f, 0.3661f, 1});
     }
 
     public static float goldShininess() {
@@ -431,15 +432,15 @@ public class Utils {
 
     // SILVER material - ambient, diffuse, specular, and shininess
     public static float[] silverAmbient() {
-        return (new float[]{0.1923f, 0.1923f, 0.1923f, 1});
+        return (new float[] {0.1923f, 0.1923f, 0.1923f, 1});
     }
 
     public static float[] silverDiffuse() {
-        return (new float[]{0.5075f, 0.5075f, 0.5075f, 1});
+        return (new float[] {0.5075f, 0.5075f, 0.5075f, 1});
     }
 
     public static float[] silverSpecular() {
-        return (new float[]{0.5083f, 0.5083f, 0.5083f, 1});
+        return (new float[] {0.5083f, 0.5083f, 0.5083f, 1});
     }
 
     public static float silverShininess() {
@@ -449,15 +450,15 @@ public class Utils {
 
     // BRONZE material - ambient, diffuse, specular, and shininess
     public static float[] bronzeAmbient() {
-        return (new float[]{0.2125f, 0.1275f, 0.0540f, 1});
+        return (new float[] {0.2125f, 0.1275f, 0.0540f, 1});
     }
 
     public static float[] bronzeDiffuse() {
-        return (new float[]{0.7140f, 0.4284f, 0.1814f, 1});
+        return (new float[] {0.7140f, 0.4284f, 0.1814f, 1});
     }
 
     public static float[] bronzeSpecular() {
-        return (new float[]{0.3936f, 0.2719f, 0.1667f, 1});
+        return (new float[] {0.3936f, 0.2719f, 0.1667f, 1});
     }
 
     public static float bronzeShininess() {
