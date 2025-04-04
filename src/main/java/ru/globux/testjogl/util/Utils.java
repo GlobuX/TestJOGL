@@ -138,8 +138,8 @@ public class Utils {
         List<String> lines = new ArrayList<>();
         String[] program;
 
-        ClassLoader cl = Utils.class.getClassLoader();
-        URL url = cl.getResource(filename);
+//        ClassLoader cl = Utils.class.getClassLoader();
+//        URL url = cl.getResource(filename);
 //        String file = url.getPath();
         String file = Utils.class.getClassLoader().getResource(filename).getPath();
 //        System.out.println(file);
