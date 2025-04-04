@@ -93,9 +93,9 @@ public class Instancing implements GLEventListener {
 
         // computations that build (and transform) mMat have been moved to the vertex shader
         // there is no longer any need to build an MV matrix in the Java/JOGL application
-        gl.glUniformMatrix4fv(vLoc, 1, false, vMat.get(vals)); // the shaders does need the V matrix
+        gl.glUniformMatrix4fv(vLoc, 1, false, vMat.get(vals));   // the shaders does need the V matrix
         tfLoc = gl.glGetUniformLocation(renderingProgram, "tf");    // uniform for the time factor
-        gl.glUniform1f(tfLoc, (float) timeFactor);                            // (the shader needs that too)
+        gl.glUniform1f(tfLoc, (float) timeFactor);                     // (the shader needs that too)
 
 
         gl.glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
