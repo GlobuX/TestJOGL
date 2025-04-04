@@ -64,7 +64,7 @@ public class MultipleModels implements GLEventListener {
     public void display(GLAutoDrawable drawable) {
         GL4 gl = (GL4) GLContext.getCurrentGL();
         gl.glClear(GL_DEPTH_BUFFER_BIT);
-//        gl.glClear(GL_COLOR_BUFFER_BIT);
+        gl.glClear(GL_COLOR_BUFFER_BIT);
 
         gl.glUseProgram(renderingProgram);
 
