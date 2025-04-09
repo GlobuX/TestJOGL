@@ -30,6 +30,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
 
+import org.joml.Matrix4f;
+
 public class Utils {
 
 //    public Utils() {
@@ -411,6 +413,33 @@ public class Utils {
         // now retrieve the underlying byte array from the raster data buffer
         DataBufferByte dataBuf = (DataBufferByte) raster.getDataBuffer();
         return dataBuf.getData();
+    }
+
+    public static void logMatrix(Matrix4f m) {
+        System.out.println(
+                m.get(0,0) + ", " +
+                m.get(0, 1) + ", " +
+                m.get(0,2) + ", " +
+                m.get(0,3)
+        );
+        System.out.println(
+                m.get(1,0) + ", " +
+                m.get(1, 1) + ", " +
+                m.get(1,2) + ", " +
+                m.get(1,3)
+        );
+        System.out.println(
+                m.get(2,0) + ", " +
+                m.get(2, 1) + ", " +
+                m.get(2,2) + ", " +
+                m.get(2,3)
+        );
+        System.out.println(
+                m.get(3,0) + ", " +
+                m.get(3, 1) + ", " +
+                m.get(3,2) + ", " +
+                m.get(3,3)
+        );
     }
 
     // GOLD material - ambient, diffuse, specular, and shininess

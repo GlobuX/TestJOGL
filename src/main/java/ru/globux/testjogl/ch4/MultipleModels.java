@@ -24,7 +24,8 @@ public class MultipleModels implements GLEventListener {
     private float pyrLocX, pyrLocY, pyrLocZ;
 
     // allocate variables for display() function
-    private FloatBuffer vals = Buffers.newDirectFloatBuffer(16);  // buffer for transfering matrix to uniform
+    // buffer for transfering matrix to uniform
+    private FloatBuffer vals = Buffers.newDirectFloatBuffer(16);
     private Matrix4f pMat = new Matrix4f();  // perspective matrix
     private Matrix4f vMat = new Matrix4f();  // view matrix
     private Matrix4f mMat = new Matrix4f();  // model matrix
@@ -111,12 +112,16 @@ public class MultipleModels implements GLEventListener {
 
         gl.glEnable(GL_DEPTH_TEST);
         gl.glDepthFunc(GL_LEQUAL);
+
         gl.glDrawArrays(GL_TRIANGLES, 0, 18);
     }
 
     public void init(GLAutoDrawable drawable) {
         GL4 gl = (GL4) drawable.getGL();
-        renderingProgram = Utils.createShaderProgram("ch4/shaders/vertShader_interpolated.glsl", "ch4/shaders/fragShader_interpolated.glsl");
+        renderingProgram = Utils.createShaderProgram(
+                "ch4/shaders/vertShader_interpolated.glsl",
+                "ch4/shaders/fragShader_interpolated.glsl"
+        );
         setupVertices();
         cameraX  = 0.0f;  cameraY  = 0.0f;  cameraZ  = 8.0f;
         cubeLocX = -1.0f; cubeLocY = -2.5f; cubeLocZ = 0.0f;
