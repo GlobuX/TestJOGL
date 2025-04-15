@@ -263,8 +263,9 @@ public class Utils {
         GL4 gl = (GL4) GLContext.getCurrentGL();
         int finalTextureRef;
         Texture tex = null;
+        String file = Utils.class.getClassLoader().getResource(textureFileName).getPath();
         try {
-            tex = TextureIO.newTexture(new File(textureFileName), false);
+            tex = TextureIO.newTexture(new File(file), false);
         } catch (Exception e) {
             e.printStackTrace();
         }
