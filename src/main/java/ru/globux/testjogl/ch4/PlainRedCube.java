@@ -56,6 +56,10 @@ public class PlainRedCube implements GLEventListener {
         animator.start();
     }
 
+    public static void main(String[] args) {
+        new PlainRedCube().start();
+    }
+
     public void display(GLAutoDrawable drawable) {
         GL4 gl = (GL4) GLContext.getCurrentGL();
         gl.glClear(GL_DEPTH_BUFFER_BIT);
@@ -65,9 +69,6 @@ public class PlainRedCube implements GLEventListener {
 
         mvLoc = gl.glGetUniformLocation(renderingProgram, "mv_matrix");
         pLoc = gl.glGetUniformLocation(renderingProgram, "p_matrix");
-
-        aspect = (float) glWindow.getWidth() / (float) glWindow.getHeight();
-        pMat.setPerspective((float) Math.toRadians(60.0f), aspect, 0.1f, 1000.0f);
 
         vMat.setTranslation(-cameraX, -cameraY, -cameraZ);
 
@@ -101,10 +102,15 @@ public class PlainRedCube implements GLEventListener {
 
     public void init(GLAutoDrawable drawable) {
         GL4 gl = (GL4) drawable.getGL();
-        renderingProgram = Utils.createShaderProgram("ch4/shaders/vertShader.glsl", "ch4/shaders/fragShader.glsl");
+        renderingProgram = Utils.createShaderProgram(
+                "ch4/shaders/vertShader.glsl",
+                "ch4/shaders/fragShader.glsl"
+        );
         setupVertices();
         cameraX  = 0.0f;  cameraY  = 0.0f;  cameraZ  = 8.0f;
         cubeLocX = -1.0f; cubeLocY = -2.5f; cubeLocZ = 0.0f;
+        aspect = (float) glWindow.getWidth() / (float) glWindow.getHeight();
+        pMat.setPerspective((float) Math.toRadians(60.0f), aspect, 0.1f, 1000.0f);
     }
 
     private void setupVertices() {
@@ -133,11 +139,11 @@ public class PlainRedCube implements GLEventListener {
         gl.glBufferData(GL_ARRAY_BUFFER, vertBuf.limit() * 4, vertBuf, GL_STATIC_DRAW);
     }
 
-    public static void main(String[] args) {
-        new PlainRedCube().start();
-    }
-
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+        GL4 gl = (GL4) GLContext.getCurrentGL();
+        aspect = (float) width / (float) height;
+        gl.glViewport(0, 0, width, height);
+        pMat.setPerspective((float) Math.toRadians(60.0f), aspect, 0.1f, 1000.0f);
     }
 
     public void dispose(GLAutoDrawable drawable) {
