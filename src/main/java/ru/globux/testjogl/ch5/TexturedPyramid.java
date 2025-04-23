@@ -53,6 +53,10 @@ public class TexturedPyramid extends JFrame implements GLEventListener {
         });
     }
 
+    public static void main(String[] args) {
+        new TexturedPyramid();
+    }
+
     public void display(GLAutoDrawable drawable) {
         GL4 gl = (GL4) GLContext.getCurrentGL();
         gl.glClear(GL_COLOR_BUFFER_BIT);
@@ -68,7 +72,8 @@ public class TexturedPyramid extends JFrame implements GLEventListener {
 
         mMat.identity();
         mMat.translate(pyrLocX, pyrLocY, pyrLocZ);
-        mMat.rotateXYZ(-0.45f, 0.61f, 0.0f);
+//        mMat.rotateXYZ(-0.45f, 0.61f, 0.0f);
+        mMat.rotateXYZ(-0.80f, 0.0f, 0.0f);
 
         mvMat.identity();
         mvMat.mul(vMat);
@@ -90,6 +95,8 @@ public class TexturedPyramid extends JFrame implements GLEventListener {
 
         gl.glEnable(GL_DEPTH_TEST);
         gl.glDepthFunc(GL_LEQUAL);
+
+//        gl.glCullFace(GL_BACK);
 
         gl.glDrawArrays(GL_TRIANGLES, 0, 18);
     }
@@ -128,8 +135,8 @@ public class TexturedPyramid extends JFrame implements GLEventListener {
                         0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f,  //right
                         0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f,  //back
                         0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f,  //left
-                        0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,  //LF
-                        1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f   //RR
+                        0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  //LF
+                        1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f   //RR
                 };
 
         gl.glGenVertexArrays(vao.length, vao, 0);
@@ -143,10 +150,6 @@ public class TexturedPyramid extends JFrame implements GLEventListener {
         gl.glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
         FloatBuffer texBuf = Buffers.newDirectFloatBuffer(pyrTextureCoordinates);
         gl.glBufferData(GL_ARRAY_BUFFER, texBuf.limit() * 4, texBuf, GL_STATIC_DRAW);
-    }
-
-    public static void main(String[] args) {
-        new TexturedPyramid();
     }
 
     public void dispose(GLAutoDrawable drawable) {

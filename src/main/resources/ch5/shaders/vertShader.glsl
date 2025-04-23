@@ -9,6 +9,7 @@ uniform mat4 p_matrix;
 layout (binding=0) uniform sampler2D samp;
 
 void main(void)
-{	gl_Position = p_matrix * mv_matrix * vec4(pos,1.0);
+{
+    gl_Position = p_matrix * mv_matrix * vec4(pos, 1.0);
 	tc = texCoord;
 } 
