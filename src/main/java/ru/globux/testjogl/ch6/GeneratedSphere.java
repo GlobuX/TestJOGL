@@ -5,7 +5,9 @@ import java.awt.event.WindowEvent;
 import java.nio.*;
 import java.lang.Math;
 import javax.swing.*;
+
 import static com.jogamp.opengl.GL4.*;
+
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.common.nio.Buffers;
@@ -13,8 +15,8 @@ import com.jogamp.opengl.util.Animator;
 import org.joml.*;
 import ru.globux.testjogl.util.Utils;
 
-public class GeneratedSphere extends JFrame implements GLEventListener
-{	private GLCanvas myCanvas;
+public class GeneratedSphere extends JFrame implements GLEventListener {
+    private GLCanvas myCanvas;
     private int renderingProgram;
     private int vao[] = new int[1];
     private int vbo[] = new int[3];
@@ -34,8 +36,8 @@ public class GeneratedSphere extends JFrame implements GLEventListener
     private int mvLoc, pLoc;
     private float aspect;
 
-    public GeneratedSphere()
-    {	setTitle("Chapter6 - program1");
+    public GeneratedSphere() {
+        setTitle("Chapter6 - program1");
         setSize(800, 800);
         myCanvas = new GLCanvas();
         myCanvas.addGLEventListener(this);
@@ -52,8 +54,12 @@ public class GeneratedSphere extends JFrame implements GLEventListener
         });
     }
 
-    public void display(GLAutoDrawable drawable)
-    {	GL4 gl = (GL4) GLContext.getCurrentGL();
+    public static void main(String[] args) {
+        new GeneratedSphere();
+    }
+
+    public void display(GLAutoDrawable drawable) {
+        GL4 gl = (GL4) GLContext.getCurrentGL();
         gl.glClear(GL_COLOR_BUFFER_BIT);
         gl.glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -62,7 +68,7 @@ public class GeneratedSphere extends JFrame implements GLEventListener
         mvLoc = gl.glGetUniformLocation(renderingProgram, "mv_matrix");
         pLoc = gl.glGetUniformLocation(renderingProgram, "p_matrix");
 
-        vMat.identity().setTranslation(-cameraX,-cameraY,-cameraZ);
+        vMat.identity().setTranslation(-cameraX, -cameraY, -cameraZ);
 
         mMat.identity();
         mMat.translate(sphLocX, sphLocY, sphLocZ);
@@ -90,9 +96,11 @@ public class GeneratedSphere extends JFrame implements GLEventListener
         gl.glDrawArrays(GL_TRIANGLES, 0, numSphereVerts);
     }
 
-    public void init(GLAutoDrawable drawable)
-    {	GL4 gl = (GL4) GLContext.getCurrentGL();
-        renderingProgram = Utils.createShaderProgram("code/vertShader.glsl", "code/fragShader.glsl");
+    public void init(GLAutoDrawable drawable) {
+        GL4 gl = (GL4) GLContext.getCurrentGL();
+        renderingProgram = Utils.createShaderProgram(
+                "ch6/shaders/vertShader.glsl",
+                "ch6/shaders/fragShader.glsl");
 
         aspect = (float) myCanvas.getWidth() / (float) myCanvas.getHeight();
         pMat.identity().setPerspective((float) Math.toRadians(60.0f), aspect, 0.1f, 1000.0f);
@@ -102,33 +110,33 @@ public class GeneratedSphere extends JFrame implements GLEventListener
         cameraX = 0.0f; cameraY = 0.0f; cameraZ = 1.6f;
         sphLocX = 0.0f; sphLocY = 0.0f; sphLocZ = -1.0f;
 
-        earthTexture = Utils.loadTexture("earth.jpg");
+        earthTexture = Utils.loadTexture("ch6/textures/earth.jpg");
     }
 
-    private void setupVertices()
-    {	GL4 gl = (GL4) GLContext.getCurrentGL();
+    private void setupVertices() {
+        GL4 gl = (GL4) GLContext.getCurrentGL();
 
         mySphere = new Sphere(96);
         numSphereVerts = mySphere.getIndices().length;
 
         int[] indices = mySphere.getIndices();
         Vector3f[] vert = mySphere.getVertices();
-        Vector2f[] tex  = mySphere.getTexCoords();
+        Vector2f[] tex = mySphere.getTexCoords();
         Vector3f[] norm = mySphere.getNormals();
 
-        float[] pvalues = new float[indices.length*3];
-        float[] tvalues = new float[indices.length*2];
-        float[] nvalues = new float[indices.length*3];
+        float[] pvalues = new float[indices.length * 3];
+        float[] tvalues = new float[indices.length * 2];
+        float[] nvalues = new float[indices.length * 3];
 
-        for (int i=0; i<indices.length; i++)
-        {	pvalues[i*3] = (float) (vert[indices[i]]).x;
-            pvalues[i*3+1] = (float) (vert[indices[i]]).y;
-            pvalues[i*3+2] = (float) (vert[indices[i]]).z;
-            tvalues[i*2] = (float) (tex[indices[i]]).x;
-            tvalues[i*2+1] = (float) (tex[indices[i]]).y;
-            nvalues[i*3] = (float) (norm[indices[i]]).x;
-            nvalues[i*3+1]= (float)(norm[indices[i]]).y;
-            nvalues[i*3+2]=(float) (norm[indices[i]]).z;
+        for (int i = 0; i < indices.length; i++) {
+            pvalues[i * 3]     = (float) (vert[indices[i]]).x;
+            pvalues[i * 3 + 1] = (float) (vert[indices[i]]).y;
+            pvalues[i * 3 + 2] = (float) (vert[indices[i]]).z;
+            tvalues[i * 2]     = (float) (tex[indices[i]]).x;
+            tvalues[i * 2 + 1] = (float) (tex[indices[i]]).y;
+            nvalues[i * 3]     = (float) (norm[indices[i]]).x;
+            nvalues[i * 3 + 1] = (float) (norm[indices[i]]).y;
+            nvalues[i * 3 + 2] = (float) (norm[indices[i]]).z;
         }
 
         gl.glGenVertexArrays(vao.length, vao, 0);
@@ -137,21 +145,22 @@ public class GeneratedSphere extends JFrame implements GLEventListener
 
         gl.glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
         FloatBuffer vertBuf = Buffers.newDirectFloatBuffer(pvalues);
-        gl.glBufferData(GL_ARRAY_BUFFER, vertBuf.limit()*4, vertBuf, GL_STATIC_DRAW);
+        gl.glBufferData(GL_ARRAY_BUFFER, vertBuf.limit() * 4, vertBuf, GL_STATIC_DRAW);
 
         gl.glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
         FloatBuffer texBuf = Buffers.newDirectFloatBuffer(tvalues);
-        gl.glBufferData(GL_ARRAY_BUFFER, texBuf.limit()*4, texBuf, GL_STATIC_DRAW);
+        gl.glBufferData(GL_ARRAY_BUFFER, texBuf.limit() * 4, texBuf, GL_STATIC_DRAW);
 
         gl.glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
         FloatBuffer norBuf = Buffers.newDirectFloatBuffer(nvalues);
-        gl.glBufferData(GL_ARRAY_BUFFER, norBuf.limit()*4,norBuf, GL_STATIC_DRAW);
+        gl.glBufferData(GL_ARRAY_BUFFER, norBuf.limit() * 4, norBuf, GL_STATIC_DRAW);
     }
 
-    public static void main(String[] args) { new GeneratedSphere(); }
-    public void dispose(GLAutoDrawable drawable) {}
-    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height)
-    {	aspect = (float) myCanvas.getWidth() / (float) myCanvas.getHeight();
+    public void dispose(GLAutoDrawable drawable) {
+    }
+
+    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
+        aspect = (float) myCanvas.getWidth() / (float) myCanvas.getHeight();
         pMat.identity().setPerspective((float) Math.toRadians(60.0f), aspect, 0.1f, 1000.0f);
     }
 }
