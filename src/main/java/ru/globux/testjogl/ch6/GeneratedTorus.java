@@ -15,17 +15,17 @@ import com.jogamp.opengl.util.Animator;
 import org.joml.*;
 import ru.globux.testjogl.util.Utils;
 
-public class GeneratedSphere extends JFrame implements GLEventListener {
+public class GeneratedTorus extends JFrame implements GLEventListener {
     private GLCanvas myCanvas;
     private int renderingProgram;
     private int vao[] = new int[1];
-    private int vbo[] = new int[3];
+    private int vbo[] = new int[4];
     private float cameraX, cameraY, cameraZ;
-    private float sphLocX, sphLocY, sphLocZ;
-    private int earthTexture;
+    private float torLocX, torLocY, torLocZ;
+    private int brickTexture;
 
-    private Sphere mySphere;
-    private int numSphereVerts;
+    private Torus myTorus;
+    private int numTorusIndices, numTorusVertices;
 
     // allocate variables for display() function
     private FloatBuffer vals = Buffers.newDirectFloatBuffer(16);
@@ -36,9 +36,9 @@ public class GeneratedSphere extends JFrame implements GLEventListener {
     private int mvLoc, pLoc;
     private float aspect;
 
-    public GeneratedSphere() {
-        setTitle("Chapter6 - program1");
-        setSize(800, 800);
+    public GeneratedTorus() {
+        setTitle("Chapter6 - program2");
+        setSize(1024, 600);
         myCanvas = new GLCanvas();
         myCanvas.addGLEventListener(this);
         this.add(myCanvas);
@@ -55,12 +55,13 @@ public class GeneratedSphere extends JFrame implements GLEventListener {
     }
 
     public static void main(String[] args) {
-        new GeneratedSphere();
+        new GeneratedTorus();
     }
 
     public void display(GLAutoDrawable drawable) {
         GL4 gl = (GL4) GLContext.getCurrentGL();
         gl.glClear(GL_COLOR_BUFFER_BIT);
+        gl.glClearColor(0.0f, 0.0f, 0.25f, 1.0f);
         gl.glClear(GL_DEPTH_BUFFER_BIT);
 
         gl.glUseProgram(renderingProgram);
@@ -71,7 +72,8 @@ public class GeneratedSphere extends JFrame implements GLEventListener {
         vMat.identity().setTranslation(-cameraX, -cameraY, -cameraZ);
 
         mMat.identity();
-        mMat.translate(sphLocX, sphLocY, sphLocZ);
+        mMat.translate(torLocX, torLocY, torLocZ);
+        mMat.rotateX((float) Math.toRadians(30.0f));
 
         mvMat.identity();
         mvMat.mul(vMat);
@@ -89,11 +91,15 @@ public class GeneratedSphere extends JFrame implements GLEventListener {
         gl.glEnableVertexAttribArray(1);
 
         gl.glActiveTexture(GL_TEXTURE0);
-        gl.glBindTexture(GL_TEXTURE_2D, earthTexture);
+        gl.glBindTexture(GL_TEXTURE_2D, brickTexture);
 
         gl.glEnable(GL_CULL_FACE);
         gl.glFrontFace(GL_CCW);
-        gl.glDrawArrays(GL_TRIANGLES, 0, numSphereVerts);
+        gl.glEnable(GL_DEPTH_TEST);
+        gl.glDepthFunc(GL_LEQUAL);
+
+        gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[3]);
+        gl.glDrawElements(GL_TRIANGLES, numTorusIndices, GL_UNSIGNED_INT, 0);
     }
 
     public void init(GLAutoDrawable drawable) {
@@ -108,41 +114,43 @@ public class GeneratedSphere extends JFrame implements GLEventListener {
 
         setupVertices();
 
-        cameraX = 0.0f; cameraY = 0.0f; cameraZ = 1.6f;
-        sphLocX = 0.0f; sphLocY = 0.0f; sphLocZ = -1.0f;
+        cameraX = 0.0f; cameraY = 0.0f; cameraZ = 1.2f;
+        torLocX = 0.0f; torLocY = 0.0f; torLocZ = -0.5f;
 
-        earthTexture = Utils.loadTexture("ch6/textures/earth.jpg");
+        brickTexture = Utils.loadTexture("ch6/textures/brick1.jpg");
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     }
 
     private void setupVertices() {
         GL4 gl = (GL4) GLContext.getCurrentGL();
 
-        mySphere = new Sphere(96);
-        numSphereVerts = mySphere.getIndices().length;
+        myTorus = new Torus(0.5f, 0.2f, 48);
+        numTorusVertices = myTorus.getNumVertices();
+        numTorusIndices = myTorus.getNumIndices();
 
-        int[] indices = mySphere.getIndices();
-        Vector3f[] vert = mySphere.getVertices();
-        Vector2f[] tex = mySphere.getTexCoords();
-        Vector3f[] norm = mySphere.getNormals();
+        Vector3f[] vertices = myTorus.getVertices();
+        Vector2f[] texCoords = myTorus.getTexCoords();
+        Vector3f[] normals = myTorus.getNormals();
+        int[] indices = myTorus.getIndices();
 
-        float[] pvalues = new float[indices.length * 3];
-        float[] tvalues = new float[indices.length * 2];
-        float[] nvalues = new float[indices.length * 3];
+        float[] pvalues = new float[vertices.length * 3];
+        float[] tvalues = new float[texCoords.length * 2];
+        float[] nvalues = new float[normals.length * 3];
 
-        for (int i = 0; i < indices.length; i++) {
-            pvalues[i * 3]     = (float) (vert[indices[i]]).x;
-            pvalues[i * 3 + 1] = (float) (vert[indices[i]]).y;
-            pvalues[i * 3 + 2] = (float) (vert[indices[i]]).z;
-            tvalues[i * 2]     = (float) (tex[indices[i]]).x;
-            tvalues[i * 2 + 1] = (float) (tex[indices[i]]).y;
-            nvalues[i * 3]     = (float) (norm[indices[i]]).x;
-            nvalues[i * 3 + 1] = (float) (norm[indices[i]]).y;
-            nvalues[i * 3 + 2] = (float) (norm[indices[i]]).z;
+        for (int i = 0; i < numTorusVertices; i++) {
+            pvalues[i * 3] = (float) vertices[i].x();
+            pvalues[i * 3 + 1] = (float) vertices[i].y();
+            pvalues[i * 3 + 2] = (float) vertices[i].z();
+            tvalues[i * 2] = (float) texCoords[i].x();
+            tvalues[i * 2 + 1] = (float) texCoords[i].y();
+            nvalues[i * 3] = (float) normals[i].x();
+            nvalues[i * 3 + 1] = (float) normals[i].y();
+            nvalues[i * 3 + 2] = (float) normals[i].z();
         }
 
         gl.glGenVertexArrays(vao.length, vao, 0);
         gl.glBindVertexArray(vao[0]);
-        gl.glGenBuffers(3, vbo, 0);
+        gl.glGenBuffers(4, vbo, 0);
 
         gl.glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
         FloatBuffer vertBuf = Buffers.newDirectFloatBuffer(pvalues);
@@ -155,6 +163,10 @@ public class GeneratedSphere extends JFrame implements GLEventListener {
         gl.glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
         FloatBuffer norBuf = Buffers.newDirectFloatBuffer(nvalues);
         gl.glBufferData(GL_ARRAY_BUFFER, norBuf.limit() * 4, norBuf, GL_STATIC_DRAW);
+
+        gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[3]);
+        IntBuffer idxBuf = Buffers.newDirectIntBuffer(indices);
+        gl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, idxBuf.limit() * 4, idxBuf, GL_STATIC_DRAW);
     }
 
     public void dispose(GLAutoDrawable drawable) {
